@@ -1,11 +1,10 @@
 package com.example.Veterinaria.Repository;
 
-import com.example.Veterinaria.Entity.Usuario;
+import com.example.Veterinaria.Entity.HistoriaClinica;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface HistoriaClinicaRepository extends JpaRepository<HistoriaClinica, Long> {
 
-    void deleteAllById(Long id);
 }

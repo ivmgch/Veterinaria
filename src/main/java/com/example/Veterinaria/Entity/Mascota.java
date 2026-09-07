@@ -29,7 +29,7 @@ public class Mascota {
     @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL)
     private HistoriaClinica historiaClinica;
 
-    // Relacin una mascota puede ser atendida por varios veterinarios
+    // Relacion una mascota puede ser atendida por varios veterinarios
     @ManyToMany
     @JoinTable(
             name = "mascota_veterinario",
