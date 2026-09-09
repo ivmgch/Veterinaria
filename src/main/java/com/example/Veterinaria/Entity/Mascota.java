@@ -1,5 +1,6 @@
 package com.example.Veterinaria.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,21 +21,20 @@ public class Mascota {
     private Integer edad;
     private Double peso;
 
-    // Relacion varias mascotas pertenecen a un propietario
     @ManyToOne
-    @JoinColumn(name = "propietario_id", nullable = false)
+    @JoinColumn(name = "propietario_id")
     private Propietario propietario;
 
-    // Relacion una mascota tiene una unica historia clinica
+    // AHORA SÍ: Delegamos la responsabilidad a HistoriaClinica con el mappedBy
     @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL)
     private HistoriaClinica historiaClinica;
 
-    // Relacion una mascota puede ser atendida por varios veterinarios
     @ManyToMany
     @JoinTable(
             name = "mascota_veterinario",
             joinColumns = @JoinColumn(name = "mascota_id"),
             inverseJoinColumns = @JoinColumn(name = "veterinario_id")
     )
+    @JsonIgnore
     private List<Veterinario> veterinarios;
 }

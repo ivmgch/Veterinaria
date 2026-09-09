@@ -1,4 +1,6 @@
 package com.example.Veterinaria.Entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,5 +22,6 @@ public class Veterinario {
 
     // Relacion un veterinario atiende a varias mascotas
     @ManyToMany(mappedBy = "veterinarios")
+    @JsonIgnore
     private List<Mascota> mascotas;
 }

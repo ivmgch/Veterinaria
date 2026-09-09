@@ -1,5 +1,6 @@
 package com.example.Veterinaria.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,7 +21,8 @@ public class Propietario {
     private String correo;
 
     // Relacion un propietario tiene Varias mascotas
-    @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Mascota> mascotas;
 
 }
