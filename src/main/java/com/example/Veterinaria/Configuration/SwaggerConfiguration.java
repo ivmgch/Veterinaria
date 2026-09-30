@@ -13,11 +13,11 @@ public class SwaggerConfiguration {
     public OpenAPI customOpenAPI(){
         return new OpenAPI()
                 .info(new Info()
-                        .title("API Usuario")
+                        .title("API Veterinaria")
                         .version("1.0")
-                        .description("Documentacion de la API para gestionar BD en la tabla usuarios")
+                        .description("Documentación de la API para el sistema de gestión de la Clínica Veterinaria")
                         .contact(new Contact()
-                                .name("Sporte API")
+                                .name("Soporte API")
                                 .email("imgarcia@ucundinamarca.edu.co")));
 
 

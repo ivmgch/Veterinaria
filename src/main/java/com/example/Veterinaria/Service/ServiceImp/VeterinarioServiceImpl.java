@@ -1,14 +1,12 @@
 package com.example.Veterinaria.Service.ServiceImp;
 
-import com.example.Veterinaria.Entity.HistoriaClinica;
-import com.example.Veterinaria.Service.VeterinarioService;
 import com.example.Veterinaria.Entity.Veterinario;
+import com.example.Veterinaria.Exception.ResourceNotFoundException;
 import com.example.Veterinaria.Repository.VeterinarioRepository;
-import lombok.AllArgsConstructor;
+import com.example.Veterinaria.Service.VeterinarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class VeterinarioServiceImpl implements VeterinarioService {
     @Transactional(readOnly = true)
     public Veterinario buscarPorId(Long id) {
         return veterinarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veterinario no encontrado con el ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Veterinario no encontrado con el ID: " + id));
     }
 
     @Override
@@ -56,5 +54,4 @@ public class VeterinarioServiceImpl implements VeterinarioService {
         Veterinario veterinario = buscarPorId(id);
         veterinarioRepository.delete(veterinario);
     }
-
 }
