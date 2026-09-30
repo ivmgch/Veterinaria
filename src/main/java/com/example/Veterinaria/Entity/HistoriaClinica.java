@@ -1,16 +1,21 @@
 package com.example.Veterinaria.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "historias_clinicas")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class HistoriaClinica {
 
     @Id
@@ -32,4 +37,5 @@ public class HistoriaClinica {
     @JoinColumn(name = "mascota_id", nullable = false, unique = true)
     @JsonIgnoreProperties("historiaClinica")
     private Mascota mascota;
+
 }

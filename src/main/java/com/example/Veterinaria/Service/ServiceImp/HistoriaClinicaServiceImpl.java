@@ -2,6 +2,7 @@ package com.example.Veterinaria.Service.ServiceImp;
 
 import com.example.Veterinaria.Entity.HistoriaClinica;
 import com.example.Veterinaria.Entity.Mascota;
+import com.example.Veterinaria.Exception.ResourceNotFoundException;
 import com.example.Veterinaria.Repository.HistoriaClinicaRepository;
 import com.example.Veterinaria.Repository.MascotaRepository;
 import com.example.Veterinaria.Service.HistoriaClinicaService;
@@ -28,17 +29,18 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
     @Transactional(readOnly = true)
     public HistoriaClinica buscarPorId(Long id) {
         return historiaClinicaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Historia clínica no encontrada con el ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Historia clínica no encontrada con el ID: " + id));
     }
 
     @Override
     @Transactional
     public HistoriaClinica crear(HistoriaClinica historia, Long mascotaId) {
         Mascota mascota = mascotaRepository.findById(mascotaId)
-                .orElseThrow(() -> new RuntimeException("Mascota no encontrada con el ID: " + mascotaId));
+                .orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada con el ID: " + mascotaId));
 
         if (mascota.getHistoriaClinica() != null) {
-            throw new RuntimeException("La mascota con ID " + mascotaId + " ya tiene una historia clínica registrada.");
+            // Utilizamos IllegalStateException para reglas de negocio
+            throw new IllegalStateException("La mascota con ID " + mascotaId + " ya tiene una historia clínica registrada.");
         }
 
         historia.setMascota(mascota);

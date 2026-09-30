@@ -4,19 +4,23 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "mascotas")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Mascota {
 
-
     @Id
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
@@ -45,11 +49,9 @@ public class Mascota {
             joinColumns = @JoinColumn(name = "mascota_id"),
             inverseJoinColumns = @JoinColumn(name = "veterinario_id")
     )
-    @JsonIgnoreProperties("mascotas") // Evita bucle circular en GET
-    @Schema(hidden = true)            // Oculta el campo en el POST de Swagger
-    private List<Veterinario> veterinarios;
-
-
+    @JsonIgnoreProperties("mascotas") // Evita bucle circular en la serialización JSON
+    @Schema(hidden = true)            // Oculta el campo en el Swagger POST
+    private List<Veterinario> veterinarios = new ArrayList<>(); // <-- Inicialización salvadora
 
     // Metodo auxiliar para asegurar la relación bidireccional en el OneToOne
     public void setHistoriaClinica(HistoriaClinica historiaClinica) {

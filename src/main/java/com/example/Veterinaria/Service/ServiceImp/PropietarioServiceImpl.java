@@ -1,5 +1,7 @@
 package com.example.Veterinaria.Service.ServiceImp;
+
 import com.example.Veterinaria.Entity.Propietario;
+import com.example.Veterinaria.Exception.ResourceNotFoundException;
 import com.example.Veterinaria.Repository.PropietarioRepository;
 import com.example.Veterinaria.Service.PropietarioService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class PropietarioServiceImpl implements PropietarioService {
     @Transactional(readOnly = true)
     public Propietario buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Propietario no encontrado con el ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Propietario no encontrado con el ID: " + id));
     }
 
     @Override
