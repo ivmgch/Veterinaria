@@ -2,45 +2,59 @@ package com.example.Veterinaria.Controller;
 
 import com.example.Veterinaria.Entity.Mascota;
 import com.example.Veterinaria.Service.MascotaService;
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/mascota")
-@AllArgsConstructor
+@RequestMapping("/api/mascotas")
+@RequiredArgsConstructor
+
 public class MascotaController {
 
-    private final MascotaService mascotaService;
+    private final MascotaService service;
 
-    @GetMapping("/buscar/{id}")
-    public Mascota buscarPorId(@PathVariable Long id) {
-        return mascotaService.buscarPorId(id);
+    @GetMapping
+    public List<Mascota> listar() {
+        return service.listarTodas();
+    }
+
+    @GetMapping("/{id}")
+    public Mascota buscar(@PathVariable Long id) {
+        return service.buscarPorId(id);
     }
 
     @GetMapping("/propietario/{propietarioId}")
     public List<Mascota> buscarPorPropietario(@PathVariable Long propietarioId) {
-        return mascotaService.buscarPorPropietario(propietarioId);
+        return service.buscarPorPropietario(propietarioId);
     }
 
-    @PostMapping("/guardar/{propietarioId}")
-    public Mascota guardar(@RequestBody Mascota mascota, @PathVariable Long propietarioId) {
-        return mascotaService.guardar(mascota, propietarioId);
+    @PostMapping("/propietario/{propietarioId}")
+    public ResponseEntity<Mascota> guardar(@Valid @RequestBody Mascota mascota, @PathVariable Long propietarioId) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.guardar(mascota, propietarioId));
     }
 
-    @PutMapping("/actualizar/{id}")
-    public Mascota actualizar(@PathVariable Long id, @RequestBody Mascota mascota) {
-        return mascotaService.actualizar(id, mascota);
+    @PutMapping("/{id}")
+    public Mascota actualizar(@PathVariable Long id, @Valid @RequestBody Mascota mascota) {
+        return service.actualizar(id, mascota);
     }
 
-    @PutMapping("/{mascotaId}/asignar-veterinario/{veterinarioId}")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{mascotaId}/veterinarios/{veterinarioId}")
     public Mascota asignarVeterinario(@PathVariable Long mascotaId, @PathVariable Long veterinarioId) {
-        return mascotaService.asignarVeterinario(mascotaId, veterinarioId);
+        return service.asignarVeterinario(mascotaId, veterinarioId);
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public void eliminar(@PathVariable Long id) {
-        mascotaService.eliminar(id);
-    }
+
 }

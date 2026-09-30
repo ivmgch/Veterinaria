@@ -18,7 +18,7 @@ public class SwaggerConfiguration {
                         .description("Documentacion de la API para gestionar BD en la tabla usuarios")
                         .contact(new Contact()
                                 .name("Sporte API")
-                                .email("jmfranciscocuervo@ucundinamarca.edu.co")));
+                                .email("imgarcia@ucundinamarca.edu.co")));
 
 
     }

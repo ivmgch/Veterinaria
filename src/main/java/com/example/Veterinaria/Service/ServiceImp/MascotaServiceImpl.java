@@ -7,63 +7,83 @@ import com.example.Veterinaria.Repository.MascotaRepository;
 import com.example.Veterinaria.Repository.PropietarioRepository;
 import com.example.Veterinaria.Repository.VeterinarioRepository;
 import com.example.Veterinaria.Service.MascotaService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MascotaServiceImpl implements MascotaService {
 
     private final MascotaRepository mascotaRepository;
     private final PropietarioRepository propietarioRepository;
     private final VeterinarioRepository veterinarioRepository;
 
+
     @Override
-    public Mascota buscarPorId(Long id) {
-        return mascotaRepository.findById(id).orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+    @Transactional(readOnly = true)
+    public List<Mascota> listarTodas() {
+        return mascotaRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Mascota buscarPorId(Long id) {
+        return mascotaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada con el ID: " + id));
+    }
+
+    @Override
+    @Transactional
     public Mascota guardar(Mascota mascota, Long propietarioId) {
         Propietario propietario = propietarioRepository.findById(propietarioId)
-                .orElseThrow(() -> new RuntimeException("Propietario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Propietario no encontrado con el ID: " + propietarioId));
+
         mascota.setPropietario(propietario);
         return mascotaRepository.save(mascota);
     }
 
     @Override
-    public Mascota actualizar(Long id, Mascota mascota) {
-        Mascota existente = buscarPorId(id);
-        existente.setNombre(mascota.getNombre());
-        existente.setEspecie(mascota.getEspecie());
-        existente.setRaza(mascota.getRaza());
-        existente.setEdad(mascota.getEdad());
-        existente.setPeso(mascota.getPeso());
-        return mascotaRepository.save(existente);
+    @Transactional
+    public Mascota actualizar(Long id, Mascota mascotaDetalles) {
+        Mascota mascotaExistente = buscarPorId(id);
+
+        mascotaExistente.setNombre(mascotaDetalles.getNombre());
+        mascotaExistente.setEspecie(mascotaDetalles.getEspecie());
+        mascotaExistente.setRaza(mascotaDetalles.getRaza());
+        mascotaExistente.setEdad(mascotaDetalles.getEdad());
+        mascotaExistente.setPeso(mascotaDetalles.getPeso());
+
+        return mascotaRepository.save(mascotaExistente);
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
-        if (!mascotaRepository.existsById(id)) {
-            throw new RuntimeException("Mascota no existe");
-        }
-        mascotaRepository.deleteById(id);
+        Mascota mascota = buscarPorId(id);
+        mascotaRepository.delete(mascota);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Mascota> buscarPorPropietario(Long propietarioId) {
         return mascotaRepository.findByPropietarioId(propietarioId);
     }
 
     @Override
+    @Transactional
     public Mascota asignarVeterinario(Long mascotaId, Long veterinarioId) {
         Mascota mascota = buscarPorId(mascotaId);
         Veterinario veterinario = veterinarioRepository.findById(veterinarioId)
-                .orElseThrow(() -> new RuntimeException("Veterinario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Veterinario no encontrado con el ID: " + veterinarioId));
 
-        mascota.getVeterinarios().add(veterinario);
+        if (!mascota.getVeterinarios().contains(veterinario)) {
+            mascota.getVeterinarios().add(veterinario);
+        }
+
         return mascotaRepository.save(mascota);
     }
+
 }
