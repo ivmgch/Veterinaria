@@ -7,6 +7,7 @@ import com.example.Veterinaria.Repository.MascotaRepository;
 import com.example.Veterinaria.Service.HistoriaClinicaService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,41 +15,59 @@ import java.util.List;
 @AllArgsConstructor
 public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
 
-    private final HistoriaClinicaRepository historiaRepository;
+    private final HistoriaClinicaRepository historiaClinicaRepository;
     private final MascotaRepository mascotaRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<HistoriaClinica> listarTodas() {
-        return historiaRepository.findAll();
+        return historiaClinicaRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public HistoriaClinica buscarPorId(Long id) {
-        return historiaRepository.findById(id).orElseThrow(() -> new RuntimeException("Historia Clínica no encontrada"));
+        return historiaClinicaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Historia clínica no encontrada con el ID: " + id));
     }
 
     @Override
+    @Transactional
     public HistoriaClinica crear(HistoriaClinica historia, Long mascotaId) {
         Mascota mascota = mascotaRepository.findById(mascotaId)
-                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
-        historia.setMascota(mascota);
-        return historiaRepository.save(historia);
-    }
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada con el ID: " + mascotaId));
 
-    @Override
-    public HistoriaClinica actualizar(Long id, HistoriaClinica historia) {
-        HistoriaClinica existente = buscarPorId(id);
-        existente.setFechaApertura(historia.getFechaApertura());
-        existente.setAntecedentes(historia.getAntecedentes());
-        existente.setObservaciones(historia.getObservaciones());
-        return historiaRepository.save(existente);
-    }
-
-    @Override
-    public void eliminar(Long id) {
-        if (!historiaRepository.existsById(id)) {
-            throw new RuntimeException("Historia Clínica no existe");
+        if (mascota.getHistoriaClinica() != null) {
+            throw new RuntimeException("La mascota con ID " + mascotaId + " ya tiene una historia clínica registrada.");
         }
-        historiaRepository.deleteById(id);
+
+        historia.setMascota(mascota);
+        mascota.setHistoriaClinica(historia);
+
+        return historiaClinicaRepository.save(historia);
+    }
+
+    @Override
+    @Transactional
+    public HistoriaClinica actualizar(Long id, HistoriaClinica historiaDetalles) {
+        HistoriaClinica historiaExistente = buscarPorId(id);
+
+        historiaExistente.setFechaApertura(historiaDetalles.getFechaApertura());
+        historiaExistente.setAntecedentes(historiaDetalles.getAntecedentes());
+        historiaExistente.setObservaciones(historiaDetalles.getObservaciones());
+
+        return historiaClinicaRepository.save(historiaExistente);
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Long id) {
+        HistoriaClinica historia = buscarPorId(id);
+
+        if (historia.getMascota() != null) {
+            historia.getMascota().setHistoriaClinica(null);
+        }
+
+        historiaClinicaRepository.delete(historia);
     }
 }

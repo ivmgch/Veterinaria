@@ -1,8 +1,11 @@
 package com.example.Veterinaria.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+
 
 import java.util.List;
 
@@ -11,8 +14,11 @@ import java.util.List;
 @Data
 public class Mascota {
 
+
     @Id
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     private String nombre;
@@ -21,20 +27,35 @@ public class Mascota {
     private Integer edad;
     private Double peso;
 
+    // Muchas Mascotas pertenecen a 1 Propietario
     @ManyToOne
-    @JoinColumn(name = "propietario_id")
+    @JoinColumn(name = "propietario_id", nullable = false)
+    @JsonIgnoreProperties("mascotas")
     private Propietario propietario;
 
-    // AHORA SÍ: Delegamos la responsabilidad a HistoriaClinica con el mappedBy
-    @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL)
+    // 1 Mascota tiene 1 única Historia Clínica
+    @OneToOne(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("mascota")
     private HistoriaClinica historiaClinica;
 
+    // Relación ManyToMany con Veterinarios
     @ManyToMany
     @JoinTable(
             name = "mascota_veterinario",
             joinColumns = @JoinColumn(name = "mascota_id"),
             inverseJoinColumns = @JoinColumn(name = "veterinario_id")
     )
-    @JsonIgnore
+    @JsonIgnoreProperties("mascotas") // Evita bucle circular en GET
+    @Schema(hidden = true)            // Oculta el campo en el POST de Swagger
     private List<Veterinario> veterinarios;
+
+
+
+    // Metodo auxiliar para asegurar la relación bidireccional en el OneToOne
+    public void setHistoriaClinica(HistoriaClinica historiaClinica) {
+        this.historiaClinica = historiaClinica;
+        if (historiaClinica != null) {
+            historiaClinica.setMascota(this);
+        }
+    }
 }

@@ -2,40 +2,48 @@ package com.example.Veterinaria.Controller;
 
 import com.example.Veterinaria.Entity.HistoriaClinica;
 import com.example.Veterinaria.Service.HistoriaClinicaService;
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/historia")
-@AllArgsConstructor
+@RequestMapping("/api/historias-clinicas")
+@RequiredArgsConstructor
 public class HistoriaClinicaController {
 
-    private final HistoriaClinicaService historiaService;
+    private final HistoriaClinicaService service;
 
-    @GetMapping("/listar")
-    public List<HistoriaClinica> listarTodas() {
-        return historiaService.listarTodas();
+    @GetMapping
+    public List<HistoriaClinica> listar() {
+        return service.listarTodas();
     }
 
-    @GetMapping("/buscar/{id}")
-    public HistoriaClinica buscarPorId(@PathVariable Long id) {
-        return historiaService.buscarPorId(id);
+    @GetMapping("/{id}")
+    public HistoriaClinica buscar(@PathVariable Long id) {
+        return service.buscarPorId(id);
     }
 
-    @PostMapping("/crear/{mascotaId}")
-    public HistoriaClinica crear(@RequestBody HistoriaClinica historia, @PathVariable Long mascotaId) {
-        return historiaService.crear(historia, mascotaId);
+    @PostMapping("/mascota/{mascotaId}")
+    public ResponseEntity<HistoriaClinica> crear(@Valid @RequestBody HistoriaClinica historia, @PathVariable Long mascotaId) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.crear(historia, mascotaId));
     }
 
-    @PutMapping("/actualizar/{id}")
-    public HistoriaClinica actualizar(@PathVariable Long id, @RequestBody HistoriaClinica historia) {
-        return historiaService.actualizar(id, historia);
+    @PutMapping("/{id}")
+    public HistoriaClinica actualizar(@PathVariable Long id, @Valid @RequestBody HistoriaClinica historia) {
+        return service.actualizar(id, historia);
     }
 
-    @DeleteMapping("/eliminar/{id}")
-    public void eliminar(@PathVariable Long id) {
-        historiaService.eliminar(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
+
+
 }
